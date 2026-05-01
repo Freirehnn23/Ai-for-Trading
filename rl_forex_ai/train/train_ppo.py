@@ -1,86 +1,85 @@
-import gymnasium as gym
-import numpy as np
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-class ForexEnv(gym.Env):
-    def __init__(self, df):
-        super(ForexEnv, self).__init__()
+import json
+import pickle
+from env.forex_env_pro import ForexEnv
+from agent.dqn_agent import DQNAgent
+from utils.data_loader import load_forex_data
 
-        self.df = df.reset_index(drop=True)
-        self.current_step = 0
+# ── Config ────────────────────────────────────────────────────────────
+DATA_PATH   = os.path.join(os.path.dirname(__file__), "../data/Data_historis(23-26).csv")
+EPISODES    = 100
+PRINT_EVERY = 10
+TRAIN_EVERY = 4
 
-        # === BALANCE SYSTEM ===
-        self.initial_balance = 1000
-        self.balance = self.initial_balance
-        self.position = 0  # 1 = buy, -1 = sell, 0 = none
+# ── Init ──────────────────────────────────────────────────────────────
+df    = load_forex_data(DATA_PATH)
+env   = ForexEnv(df)
+agent = DQNAgent(
+    state_size     = 2,
+    action_size    = 3,
+    epsilon_decay  = 0.9995,  # lebih lambat (dari 0.995)
+    buffer_capacity= 20_000,  # lebih besar (dari 10_000)
+)
 
-        # === ACTION SPACE ===
-        self.action_space = gym.spaces.Discrete(3)  # hold, buy, sell
+EPISODES    = 300   # lebih banyak (dari 100)
+TRAIN_EVERY = 2     # lebih sering train (dari 4)
 
-        # === OBSERVATION SPACE ===
-        self.observation_space = gym.spaces.Box(
-            low=-np.inf, high=np.inf, shape=(3,), dtype=np.float32
+print("=" * 55)
+print("  WEEK 1 — TRAINING DQN AGENT")
+print("=" * 55)
+print(f"  Data    : {len(df)} baris")
+print(f"  Episodes: {EPISODES}")
+print("=" * 55)
+
+rewards_history = []
+
+# ── Training Loop ─────────────────────────────────────────────────────
+for episode in range(1, EPISODES + 1):
+    obs, _ = env.reset()
+    total_reward = 0.0
+    step_count   = 0
+    done         = False
+
+    while not done:
+        action                          = agent.act(obs)
+        next_obs, reward, terminated, truncated, info = env.step(action)
+        done = terminated or truncated
+
+        agent.store(obs, action, reward, next_obs, done)
+        obs           = next_obs
+        total_reward += reward
+        step_count   += 1
+
+        if step_count % TRAIN_EVERY == 0:
+            agent.train()
+
+    rewards_history.append(float(total_reward))
+
+    if episode % PRINT_EVERY == 0 or episode == 1:
+        avg = sum(rewards_history[-PRINT_EVERY:]) / min(len(rewards_history), PRINT_EVERY)
+        print(
+            f"  Episode {episode:4d}/{EPISODES}"
+            f"  |  Reward: {total_reward:+8.4f}"
+            f"  |  Avg: {avg:+8.4f}"
+            f"  |  Epsilon: {agent.epsilon:.3f}"
         )
 
-    def reset(self, seed=None, options=None):
-        super().reset(seed=seed)
+print(f"\n  Training selesai!")
+print(f"  Reward terbaik: {max(rewards_history):+.4f}  (ep. {rewards_history.index(max(rewards_history))+1})")
 
-        self.current_step = 0
-        self.balance = self.initial_balance
-        self.position = 0
+# ── Simpan rewards ────────────────────────────────────────────────────
+os.makedirs(os.path.join(os.path.dirname(__file__), "../visualize"), exist_ok=True)
+rewards_path = os.path.join(os.path.dirname(__file__), "../visualize/rewards_history.json")
+with open(rewards_path, "w") as f:
+    json.dump(rewards_history, f)
 
-        obs = self._get_obs()
-        info = {}
+# ── Simpan model ──────────────────────────────────────────────────────
+os.makedirs(os.path.join(os.path.dirname(__file__), "../models"), exist_ok=True)
+model_path = os.path.join(os.path.dirname(__file__), "../models/trained_agent.pkl")
+with open(model_path, "wb") as f:
+    pickle.dump({"weights": agent.model.get_weights()}, f)
 
-        return obs, info
-
-    def _get_obs(self):
-        row = self.df.iloc[self.current_step]
-
-        return np.array([
-            row["close"],
-            row["rsi"],
-            self.balance
-        ], dtype=np.float32)
-
-    def step(self, action):
-        done = False
-
-        # === UPDATE POSITION ===
-        if action == 1:
-            self.position = 1
-        elif action == 2:
-            self.position = -1
-
-        # === PRICE ===
-        current_price = self.df.iloc[self.current_step]["close"]
-        next_price = self.df.iloc[self.current_step + 1]["close"]
-
-        price_change = next_price - current_price
-
-        # === REWARD ===
-        reward = self.position * price_change * 1000
-
-        # === UPDATE BALANCE ===
-        self.balance += reward
-
-        # === NEXT STEP ===
-        self.current_step += 1
-
-        # === TERMINATION ===
-        if self.current_step >= len(self.df) - 1:
-            done = True
-
-        if self.balance <= 0:
-            done = True
-
-        obs = self._get_obs()
-
-        terminated = done
-        truncated = False
-
-        info = {
-            "balance": self.balance,
-            "position": self.position
-        }
-
-        return obs, reward, terminated, truncated, info
+print(f"  Model disimpan  → {model_path}")
+print(f"  Rewards disimpan → {rewards_path}")

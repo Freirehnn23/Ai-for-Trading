@@ -1,89 +1,86 @@
 import gymnasium as gym
+from gymnasium import spaces
+import pandas as pd
 import numpy as np
 
+
 class ForexEnv(gym.Env):
+    """
+    Environment Week 1 — sederhana, gymnasium-compatible.
+    State  : [harga_sekarang, harga_sebelumnya]
+    Action : 0=hold, 1=buy, 2=sell
+    Reward : profit/loss saat close posisi
+    """
+
     def __init__(self, df):
-        super(ForexEnv, self).__init__()
+        super().__init__()
 
-        self.df = df.reset_index(drop=True)
-        self.current_step = 0
+        # Terima DataFrame langsung (bukan path)
+        self.prices = df["close"].values.astype(np.float32)
 
-        # === BALANCE SYSTEM ===
-        self.initial_balance = 1000
-        self.balance = self.initial_balance
-        self.position = 0  # 1 = buy, -1 = sell, 0 = none
+        # Normalisasi relatif ke harga pertama
+        self.prices = self.prices / self.prices[0]
 
-        # === ACTION SPACE ===
-        self.action_space = gym.spaces.Discrete(3)  # hold, buy, sell
+        self.n_steps = len(self.prices)
 
-        # === OBSERVATION SPACE ===
-        self.observation_space = gym.spaces.Box(
-            low=-np.inf, high=np.inf, shape=(3,), dtype=np.float32
+        # Wajib ada di gymnasium.Env
+        self.action_space = spaces.Discrete(3)  # hold, buy, sell
+        self.observation_space = spaces.Box(
+            low   = -np.inf,
+            high  = np.inf,
+            shape = (2,),           # [harga_kini, harga_sebelumnya]
+            dtype = np.float32
         )
 
+        # State internal
+        self.current_step = 1
+        self.position     = 0
+        self.entry_price  = 0.0
+        self.total_profit = 0.0
+
+    # ── Reset (wajib return obs, info) ────────────────────────────────
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
 
-        self.current_step = 0
-        self.balance = self.initial_balance
-        self.position = 0
+        self.current_step = 1
+        self.position     = 0
+        self.entry_price  = 0.0
+        self.total_profit = 0.0
 
-        obs = self._get_obs()
-        info = {}
+        return self._get_obs(), {}
 
-        return obs, info
-
-    def _get_obs(self):
-        row = self.df.iloc[self.current_step]
-
-        return np.array([
-            row["close"],
-            row["rsi"],
-            self.balance
-        ], dtype=np.float32)
-
+    # ── Step (wajib return obs, reward, terminated, truncated, info) ──
     def step(self, action):
-        done = False
+        current_price = self.prices[self.current_step]
+        reward        = 0.0
 
-        # === UPDATE POSITION ===
-        if action == 1:
-            self.position = 1
-        elif action == 2:
-            self.position = -1
+        if action == 1:   # BUY
+            if self.position == 0:
+                self.position    = 1
+                self.entry_price = current_price
 
-        # === PRICE ===
-        current_price = self.df.iloc[self.current_step]["close"]
-        next_price = self.df.iloc[self.current_step + 1]["close"]
+        elif action == 2:  # SELL
+            if self.position == 1:
+                reward             = float(current_price - self.entry_price)
+                self.total_profit += reward
+                self.position      = 0
+                self.entry_price   = 0.0
 
-        price_change = next_price - current_price
-
-        # === REWARD ===
-        reward = self.position * price_change
-
-        # penalty biar ga overtrade
-        reward -= 0.0001
-
-        # === UPDATE BALANCE ===
-        self.balance += reward
-
-        # === NEXT STEP ===
         self.current_step += 1
-
-        # === TERMINATION ===
-        if self.current_step >= len(self.df) - 1:
-            done = True
-
-        if self.balance <= 0:
-            done = True
-
-        obs = self._get_obs()
-
-        terminated = done
-        truncated = False
+        terminated = self.current_step >= self.n_steps - 1
+        truncated  = False
 
         info = {
-            "balance": self.balance,
-            "position": self.position
+            "price"   : float(current_price),
+            "position": self.position,
+            "profit"  : self.total_profit,
         }
 
-        return obs, reward, terminated, truncated, info
+        return self._get_obs(), reward, terminated, truncated, info
+
+    # ── Obs ───────────────────────────────────────────────────────────
+    def _get_obs(self):
+        return np.array([
+            self.prices[self.current_step],
+            self.prices[self.current_step - 1]
+        ], dtype=np.float32)

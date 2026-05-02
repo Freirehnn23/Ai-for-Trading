@@ -1,0 +1,48 @@
+[
+  {
+    "episode": 1,
+    "encoder": "lstm",
+    "train_raw_reward": 12.941996075987857,
+    "completed_episodes_in_rollout": 0,
+    "policy_loss": -0.14092092216014862,
+    "value_loss": 0.3510994017124176,
+    "entropy": 0.18129195272922516,
+    "eval_final_balance": 1246.6492456628532,
+    "eval_total_return": 0.2466492456628532,
+    "eval_total_reward": 269.78462313900104,
+    "eval_total_trades": 40,
+    "eval_win_rate": 0.55,
+    "eval_avg_win": 22.496766394748253,
+    "eval_avg_loss": -12.654423056756007,
+    "eval_profit_factor": 2.1728408867383084,
+    "eval_max_drawdown": 0.0532479479332176,
+    "eval_action_count": {
+      "HOLD": 0,
+      "BUY_OR_CLOSE_SELL": 149,
+      "SELL_OR_CLOSE_BUY": 0
+    }
+  },
+  {
+    "episode": 2,
+    "encoder": "lstm",
+    "train_raw_reward": 9.559021992878183,
+    "completed_episodes_in_rollout": 0,
+    "policy_loss": 0.21072088181972504,
+    "value_loss": 0.18068411946296692,
+    "entropy": 0.1640806496143341,
+    "eval_final_balance": 1246.6492456628544,
+    "eval_total_return": 0.24664924566285434,
+    "eval_total_reward": 269.78256324520476,
+    "eval_total_trades": 40,
+    "eval_win_rate": 0.55,
+    "eval_avg_win": 22.496766394748242,
+    "eval_avg_loss": -12.654423056755988,
+    "eval_profit_factor": 2.1728408867383107,
+    "eval_max_drawdown": 0.0532479479332174,
+    "eval_action_count": {
+      "HOLD": 0,
+      "BUY_OR_CLOSE_SELL": 149,
+      "SELL_OR_CLOSE_BUY": 0
+    }
+  }
+]

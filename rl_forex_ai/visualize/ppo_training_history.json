@@ -1,0 +1,467 @@
+[
+  {
+    "episode": 1,
+    "train_reward_raw": 420.3655311600817,
+    "eval_final_balance": 1246.6492456628541,
+    "eval_total_return": 0.24664924566285412,
+    "eval_total_trades": 40,
+    "action_count": [
+      0,
+      149,
+      0
+    ],
+    "policy_loss": 0.06006249785423279,
+    "value_loss": 0.005868829786777496,
+    "entropy": 0.8951221704483032
+  },
+  {
+    "episode": 10,
+    "train_reward_raw": 148.90113108104035,
+    "eval_final_balance": 1221.8234037214552,
+    "eval_total_return": 0.22182340372145518,
+    "eval_total_trades": 52,
+    "action_count": [
+      17,
+      109,
+      23
+    ],
+    "policy_loss": -0.008140694350004196,
+    "value_loss": 0.0004134268965572119,
+    "entropy": 0.8863706588745117
+  },
+  {
+    "episode": 20,
+    "train_reward_raw": 302.65252847365804,
+    "eval_final_balance": 1292.6904895115877,
+    "eval_total_return": 0.29269048951158766,
+    "eval_total_trades": 43,
+    "action_count": [
+      0,
+      140,
+      9
+    ],
+    "policy_loss": -0.3138231337070465,
+    "value_loss": 0.00033110816730186343,
+    "entropy": 0.853705644607544
+  },
+  {
+    "episode": 30,
+    "train_reward_raw": 246.10371889876546,
+    "eval_final_balance": 1231.7496216407746,
+    "eval_total_return": 0.23174962164077464,
+    "eval_total_trades": 49,
+    "action_count": [
+      0,
+      131,
+      18
+    ],
+    "policy_loss": -0.03781948238611221,
+    "value_loss": 0.000383430888177827,
+    "entropy": 0.9283305406570435
+  },
+  {
+    "episode": 40,
+    "train_reward_raw": 250.88920586229693,
+    "eval_final_balance": 1194.575715640081,
+    "eval_total_return": 0.19457571564008094,
+    "eval_total_trades": 47,
+    "action_count": [
+      0,
+      132,
+      17
+    ],
+    "policy_loss": -0.03210747241973877,
+    "value_loss": 0.00036545429611578584,
+    "entropy": 0.8529422879219055
+  },
+  {
+    "episode": 50,
+    "train_reward_raw": 182.54491180765302,
+    "eval_final_balance": 1281.6514635361543,
+    "eval_total_return": 0.28165146353615433,
+    "eval_total_trades": 45,
+    "action_count": [
+      4,
+      137,
+      8
+    ],
+    "policy_loss": -0.0019353628158569336,
+    "value_loss": 0.0006492947577498853,
+    "entropy": 0.811008095741272
+  },
+  {
+    "episode": 60,
+    "train_reward_raw": 341.05868742255143,
+    "eval_final_balance": 1259.6215590076251,
+    "eval_total_return": 0.2596215590076251,
+    "eval_total_trades": 42,
+    "action_count": [
+      1,
+      143,
+      5
+    ],
+    "policy_loss": 0.024423372000455856,
+    "value_loss": 0.0002723557408899069,
+    "entropy": 0.808235764503479
+  },
+  {
+    "episode": 70,
+    "train_reward_raw": 383.67782828873607,
+    "eval_final_balance": 1246.6492456628534,
+    "eval_total_return": 0.24664924566285346,
+    "eval_total_trades": 40,
+    "action_count": [
+      39,
+      110,
+      0
+    ],
+    "policy_loss": -0.01889868453145027,
+    "value_loss": 0.0005008181324228644,
+    "entropy": 0.8137914538383484
+  },
+  {
+    "episode": 80,
+    "train_reward_raw": 234.5558695864222,
+    "eval_final_balance": 1246.649245662853,
+    "eval_total_return": 0.24664924566285298,
+    "eval_total_trades": 40,
+    "action_count": [
+      35,
+      114,
+      0
+    ],
+    "policy_loss": -0.03297099471092224,
+    "value_loss": 0.000288937269942835,
+    "entropy": 0.7636252045631409
+  },
+  {
+    "episode": 90,
+    "train_reward_raw": 583.6878775327567,
+    "eval_final_balance": 1190.159290267747,
+    "eval_total_return": 0.1901592902677471,
+    "eval_total_trades": 41,
+    "action_count": [
+      21,
+      126,
+      2
+    ],
+    "policy_loss": -0.10313871502876282,
+    "value_loss": 0.0004187768208794296,
+    "entropy": 0.8502181768417358
+  },
+  {
+    "episode": 100,
+    "train_reward_raw": 284.51419159841384,
+    "eval_final_balance": 1284.181319050871,
+    "eval_total_return": 0.284181319050871,
+    "eval_total_trades": 47,
+    "action_count": [
+      44,
+      92,
+      13
+    ],
+    "policy_loss": 0.08871233463287354,
+    "value_loss": 0.00027847912861034274,
+    "entropy": 0.7851516008377075
+  },
+  {
+    "episode": 110,
+    "train_reward_raw": 353.62383321619325,
+    "eval_final_balance": 1124.7230013702415,
+    "eval_total_return": 0.12472300137024149,
+    "eval_total_trades": 51,
+    "action_count": [
+      47,
+      79,
+      23
+    ],
+    "policy_loss": 0.14163705706596375,
+    "value_loss": 0.00032276459387503564,
+    "entropy": 0.9084078073501587
+  },
+  {
+    "episode": 120,
+    "train_reward_raw": 443.80879103547295,
+    "eval_final_balance": 1183.2180257456987,
+    "eval_total_return": 0.1832180257456987,
+    "eval_total_trades": 44,
+    "action_count": [
+      57,
+      63,
+      29
+    ],
+    "policy_loss": -0.08648956567049026,
+    "value_loss": 0.0003748500603251159,
+    "entropy": 0.846179723739624
+  },
+  {
+    "episode": 130,
+    "train_reward_raw": 419.14068916489254,
+    "eval_final_balance": 1179.9722575152748,
+    "eval_total_return": 0.1799722575152748,
+    "eval_total_trades": 45,
+    "action_count": [
+      63,
+      64,
+      22
+    ],
+    "policy_loss": 0.007621824741363525,
+    "value_loss": 0.00026918822550214827,
+    "entropy": 0.9406712055206299
+  },
+  {
+    "episode": 140,
+    "train_reward_raw": 590.7082662681189,
+    "eval_final_balance": 1023.8443625300351,
+    "eval_total_return": 0.02384436253003514,
+    "eval_total_trades": 41,
+    "action_count": [
+      56,
+      49,
+      44
+    ],
+    "policy_loss": -0.12052597105503082,
+    "value_loss": 0.00024655499146319926,
+    "entropy": 0.9207497835159302
+  },
+  {
+    "episode": 150,
+    "train_reward_raw": 375.40350293878356,
+    "eval_final_balance": 1089.122186539699,
+    "eval_total_return": 0.08912218653969899,
+    "eval_total_trades": 36,
+    "action_count": [
+      47,
+      89,
+      13
+    ],
+    "policy_loss": -0.013746941462159157,
+    "value_loss": 0.00022008252562955022,
+    "entropy": 0.8792017698287964
+  },
+  {
+    "episode": 160,
+    "train_reward_raw": 472.92937775256655,
+    "eval_final_balance": 1102.8620775537684,
+    "eval_total_return": 0.10286207755376836,
+    "eval_total_trades": 42,
+    "action_count": [
+      4,
+      124,
+      21
+    ],
+    "policy_loss": 0.12865912914276123,
+    "value_loss": 0.0003678476787172258,
+    "entropy": 0.8955281972885132
+  },
+  {
+    "episode": 170,
+    "train_reward_raw": 589.8297676185144,
+    "eval_final_balance": 1085.4078100189097,
+    "eval_total_return": 0.08540781001890968,
+    "eval_total_trades": 42,
+    "action_count": [
+      0,
+      102,
+      47
+    ],
+    "policy_loss": 0.18594098091125488,
+    "value_loss": 0.0003169540432281792,
+    "entropy": 0.7433940768241882
+  },
+  {
+    "episode": 180,
+    "train_reward_raw": 478.588288075782,
+    "eval_final_balance": 1012.2260337092821,
+    "eval_total_return": 0.012226033709282092,
+    "eval_total_trades": 42,
+    "action_count": [
+      0,
+      86,
+      63
+    ],
+    "policy_loss": -0.01253640279173851,
+    "value_loss": 0.00029237070702947676,
+    "entropy": 0.7636975646018982
+  },
+  {
+    "episode": 190,
+    "train_reward_raw": 397.6661074960727,
+    "eval_final_balance": 1035.2911676155572,
+    "eval_total_return": 0.03529116761555724,
+    "eval_total_trades": 40,
+    "action_count": [
+      48,
+      71,
+      30
+    ],
+    "policy_loss": -0.014114350080490112,
+    "value_loss": 0.0003348141035530716,
+    "entropy": 0.8430179357528687
+  },
+  {
+    "episode": 200,
+    "train_reward_raw": 562.0706861010218,
+    "eval_final_balance": 1059.520469869786,
+    "eval_total_return": 0.059520469869785986,
+    "eval_total_trades": 37,
+    "action_count": [
+      78,
+      50,
+      21
+    ],
+    "policy_loss": -0.19983282685279846,
+    "value_loss": 0.0007887096144258976,
+    "entropy": 0.835078775882721
+  },
+  {
+    "episode": 210,
+    "train_reward_raw": 378.88271344274483,
+    "eval_final_balance": 1024.9950550927617,
+    "eval_total_return": 0.02499505509276173,
+    "eval_total_trades": 42,
+    "action_count": [
+      53,
+      61,
+      35
+    ],
+    "policy_loss": -0.18365177512168884,
+    "value_loss": 0.00046358455438166857,
+    "entropy": 0.8455219268798828
+  },
+  {
+    "episode": 220,
+    "train_reward_raw": 625.9061542218535,
+    "eval_final_balance": 1092.6478662570694,
+    "eval_total_return": 0.09264786625706938,
+    "eval_total_trades": 45,
+    "action_count": [
+      61,
+      60,
+      28
+    ],
+    "policy_loss": -0.1705837845802307,
+    "value_loss": 0.0008410834125243127,
+    "entropy": 0.7776967287063599
+  },
+  {
+    "episode": 230,
+    "train_reward_raw": 449.90282972637897,
+    "eval_final_balance": 1154.218095370016,
+    "eval_total_return": 0.15421809537001605,
+    "eval_total_trades": 44,
+    "action_count": [
+      46,
+      81,
+      22
+    ],
+    "policy_loss": 0.023747257888317108,
+    "value_loss": 0.0004216775414533913,
+    "entropy": 0.9041879773139954
+  },
+  {
+    "episode": 240,
+    "train_reward_raw": 73.80104403059802,
+    "eval_final_balance": 1175.3713572757588,
+    "eval_total_return": 0.17537135727575878,
+    "eval_total_trades": 43,
+    "action_count": [
+      48,
+      84,
+      17
+    ],
+    "policy_loss": -0.13449130952358246,
+    "value_loss": 0.00024326812126673758,
+    "entropy": 0.8720400333404541
+  },
+  {
+    "episode": 250,
+    "train_reward_raw": 592.8420592975245,
+    "eval_final_balance": 1184.186628983192,
+    "eval_total_return": 0.1841866289831919,
+    "eval_total_trades": 39,
+    "action_count": [
+      64,
+      66,
+      19
+    ],
+    "policy_loss": -0.02111721970140934,
+    "value_loss": 0.00043008243665099144,
+    "entropy": 0.8319001197814941
+  },
+  {
+    "episode": 260,
+    "train_reward_raw": 537.1719511878846,
+    "eval_final_balance": 1146.6740004951305,
+    "eval_total_return": 0.1466740004951305,
+    "eval_total_trades": 35,
+    "action_count": [
+      68,
+      53,
+      28
+    ],
+    "policy_loss": -0.0017038136720657349,
+    "value_loss": 0.00030020863050594926,
+    "entropy": 0.8381369709968567
+  },
+  {
+    "episode": 270,
+    "train_reward_raw": 307.2781618380001,
+    "eval_final_balance": 1078.399552149862,
+    "eval_total_return": 0.07839955214986208,
+    "eval_total_trades": 35,
+    "action_count": [
+      59,
+      50,
+      40
+    ],
+    "policy_loss": 0.027624860405921936,
+    "value_loss": 0.00048518128460273147,
+    "entropy": 0.7867469191551208
+  },
+  {
+    "episode": 280,
+    "train_reward_raw": 846.1928014290439,
+    "eval_final_balance": 1055.4918541653237,
+    "eval_total_return": 0.05549185416532373,
+    "eval_total_trades": 39,
+    "action_count": [
+      52,
+      52,
+      45
+    ],
+    "policy_loss": 0.12213042378425598,
+    "value_loss": 0.0006643973756581545,
+    "entropy": 0.7861669659614563
+  },
+  {
+    "episode": 290,
+    "train_reward_raw": 626.4923389612655,
+    "eval_final_balance": 1097.49545762172,
+    "eval_total_return": 0.0974954576217201,
+    "eval_total_trades": 41,
+    "action_count": [
+      69,
+      55,
+      25
+    ],
+    "policy_loss": -0.0703873261809349,
+    "value_loss": 0.00028177976491861045,
+    "entropy": 0.7113131284713745
+  },
+  {
+    "episode": 300,
+    "train_reward_raw": 832.7449252270512,
+    "eval_final_balance": 1128.7870383419056,
+    "eval_total_return": 0.1287870383419056,
+    "eval_total_trades": 37,
+    "action_count": [
+      49,
+      55,
+      45
+    ],
+    "policy_loss": 0.13797196745872498,
+    "value_loss": 0.0005186350899748504,
+    "entropy": 0.5641387701034546
+  }
+]

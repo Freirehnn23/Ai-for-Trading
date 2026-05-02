@@ -2,12 +2,6 @@
 =============================================================
 WEEK 8 — DAY 5: Final Demo + Complete Test Suite
 =============================================================
-Script ini adalah titik akhir project — menjalankan semua
-evaluasi sekaligus dan mencetak laporan komprehensif.
-
-Cara run:
-  python test/final_demo.py
-=============================================================
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,7 +12,7 @@ import numpy as np
 from utils.data_loader import load_forex_data
 from utils.metrics import (
     sharpe_ratio, max_drawdown, win_rate,
-    profit_factor, calmar_ratio, full_report, save_history
+    profit_factor, calmar_ratio, full_report
 )
 from agent.dqn_agent import DQNAgent
 from env.forex_env_pro_2 import ForexEnvWeek2
@@ -30,28 +24,57 @@ DATA_PATH = os.path.join(BASE, "data", "Data_historis(23-26).csv")
 OUT_DIR   = os.path.join(BASE, "visualize")
 MODEL_DIR = os.path.join(BASE, "models")
 
-# ── Helper ────────────────────────────────────────────────────────────
-def find_model(week):
-    for name in [f"trained_agent_week{week}.pkl",
-                 f"trained_agent_week{week-1}.pkl",
-                 "trained_agent.pkl"]:
-        p = os.path.join(MODEL_DIR, name)
-        if os.path.exists(p):
-            return p
-    return None
+# ── Helper: cek state_size dari weight model ──────────────────────────
+def get_model_state_size(model_path):
+    """Baca dimensi input dari weight layer pertama."""
+    try:
+        with open(model_path, "rb") as f:
+            saved = pickle.load(f)
+        weights = saved["weights"]
+        # weights[0] = (w, b) untuk layer pertama
+        # w.shape = (state_size, hidden_size)
+        return weights[0][0].shape[0]
+    except Exception:
+        return None
+
+def find_model_for_week(week):
+    """
+    Cari model yang state_size-nya cocok dengan week yang diminta.
+    Tidak sembarang fallback ke model lain.
+    """
+    expected_size = {2: 4, 3: 5, 4: 9}.get(week)
+    if expected_size is None:
+        return None
+
+    # Cari dari yang paling spesifik
+    candidates = [
+        os.path.join(MODEL_DIR, f"trained_agent_week{week}.pkl"),
+        os.path.join(MODEL_DIR, f"trained_agent_week{week-1}.pkl"),
+        os.path.join(MODEL_DIR, "trained_agent.pkl"),
+    ]
+    for path in candidates:
+        if not os.path.exists(path):
+            continue
+        sz = get_model_state_size(path)
+        if sz == expected_size:
+            return path
+
+    return None   # tidak ada model yang cocok
+
 
 def run_eval(env, agent, label):
     obs, _ = env.reset()
-    done = False
+    done   = False
     action_log = [0, 0, 0]
     t0 = time.time()
+
     while not done:
         action = agent.act(obs)
         obs, _, term, trunc, _ = env.step(action)
         done = term or trunc
         action_log[action] += 1
-    elapsed = time.time() - t0
 
+    elapsed = time.time() - t0
     profits = [t["profit"] if isinstance(t, dict) else t
                for t in env.trade_history]
     bal     = env.balance_history
@@ -78,9 +101,8 @@ def run_eval(env, agent, label):
         "buy_pct"       : action_log[1] / total_steps * 100,
         "sell_pct"      : action_log[2] / total_steps * 100,
         "eval_time_s"   : elapsed,
-        "balance_hist"  : bal,
-        "profits"       : profits,
     }
+
 
 def load_agent(model_path, state_size):
     agent = DQNAgent(state_size=state_size, action_size=3)
@@ -90,43 +112,62 @@ def load_agent(model_path, state_size):
     agent.epsilon = 0.0
     return agent
 
-# ─────────────────────────────────────────────────────────────────────
-# HEADER
+
 # ─────────────────────────────────────────────────────────────────────
 print()
 print("=" * 65)
 print("  🤖  RL FOREX AI — FINAL DEMO  (Week 8 Day 5)")
 print("=" * 65)
+
+df = load_forex_data(DATA_PATH)
 print(f"  Data  : {DATA_PATH}")
 print(f"  Output: {OUT_DIR}")
 print("=" * 65)
-
-df = load_forex_data(DATA_PATH)
 print()
 
-results = []
+# ── Scan semua model yang tersedia ────────────────────────────────────
+print("  Model scan:")
+for fname in sorted(os.listdir(MODEL_DIR)):
+    if fname.endswith(".pkl"):
+        p = os.path.join(MODEL_DIR, fname)
+        sz = get_model_state_size(p)
+        week_tag = {4: "W2", 5: "W3", 9: "W4"}.get(sz, "?")
+        print(f"    {fname:<35} state_size={sz}  [{week_tag}]")
+print()
+
+# ── Evaluasi per week ─────────────────────────────────────────────────
 ENV_CONFIGS = [
     (2, ForexEnvWeek2, "Week 2 — Spread+Commission"),
     (3, ForexEnvWeek3, "Week 3 — +SL/TP/Risk"),
     (4, ForexEnvWeek4, "Week 4 — +RSI/MA/S&R  [FINAL]"),
 ]
 
+results = []
 for week, EnvClass, label in ENV_CONFIGS:
-    model_path = find_model(week)
+    model_path = find_model_for_week(week)
     if model_path is None:
-        print(f"  [SKIP] {label} — model tidak ditemukan")
+        print(f"  [SKIP] {label}")
+        print(f"         → Tidak ada model dengan state_size="
+              f"{[4,5,9][[2,3,4].index(week)]}")
+        print(f"           Jalankan: python train/train_ppo.py  (WEEK={week})")
         continue
 
-    state_size = 4 if week == 2 else (5 if week == 3 else 9)
+    state_size = {2: 4, 3: 5, 4: 9}[week]
     env   = EnvClass(df)
     agent = load_agent(model_path, state_size)
     r     = run_eval(env, agent, label)
     results.append(r)
-    print(f"  ✓ {label} — evaluated ({r['eval_time_s']:.1f}s)")
+    print(f"  ✓ {label} ({r['eval_time_s']:.1f}s)")
 
 if not results:
-    print("\n  ⚠️  Tidak ada model ditemukan.")
-    print("  Jalankan dulu: python train/train_ppo.py")
+    print()
+    print("  ⚠️  Tidak ada model yang cocok ditemukan.")
+    print("  Training ulang dengan semua week:")
+    print()
+    print("    # Jalankan satu per satu:")
+    for w in [2, 3, 4]:
+        print(f"    # Edit train/train_ppo.py → WEEK={w}, lalu:")
+        print(f"    python train/train_ppo.py")
     sys.exit(1)
 
 # ─────────────────────────────────────────────────────────────────────
@@ -136,12 +177,11 @@ print()
 print("=" * 65)
 print("  📊  PERBANDINGAN PERFORMA ANTAR WEEK")
 print("=" * 65)
-hdr = f"  {'Label':<32} {'Return':>8} {'Win%':>6} {'PF':>5} {'Sharpe':>7} {'MaxDD':>7}"
-print(hdr)
+print(f"  {'Label':<34} {'Return':>8} {'Win%':>6} {'PF':>5} {'Sharpe':>7} {'MaxDD':>7}")
 print("  " + "-" * 62)
 for r in results:
-    tag = "★" if r == results[-1] else " "
-    print(f"{tag} {r['label']:<32}"
+    tag = "★ " if r == results[-1] else "  "
+    print(f"{tag}{r['label']:<34}"
           f" {r['total_return']*100:>7.1f}%"
           f" {r['win_rate']*100:>5.1f}%"
           f" {r['profit_factor']:>5.2f}"
@@ -149,7 +189,7 @@ for r in results:
           f" {r['max_drawdown']*100:>6.1f}%")
 
 # ─────────────────────────────────────────────────────────────────────
-# FULL REPORT — Best model (last = Week 4)
+# FULL REPORT — best model
 # ─────────────────────────────────────────────────────────────────────
 best = results[-1]
 print()
@@ -190,30 +230,23 @@ checks = [
     ("Mix: tidak 100% hold", best['hold_pct'] < 99.0),
 ]
 
-passed = 0
+passed = sum(ok for _, ok in checks)
 for desc, ok in checks:
-    status = "✅" if ok else "❌"
-    print(f"  {status}  {desc}")
-    passed += ok
+    print(f"  {'✅' if ok else '❌'}  {desc}")
 
-grade_map = [(7, "EXCELLENT 🏆"), (6, "GOOD 🥇"), (5, "PASS ✓"),
-             (4, "MARGINAL ⚠️"), (0, "FAIL ❌")]
-grade = next(g for n, g in grade_map if passed >= n)
+grade_map = [(7,"EXCELLENT 🏆"),(6,"GOOD 🥇"),(5,"PASS ✓"),
+             (4,"MARGINAL ⚠️"),(0,"FAIL ❌")]
+grade = next(g for n,g in grade_map if passed >= n)
 print()
 print(f"  Score: {passed}/{len(checks)}  →  {grade}")
 
 # ─────────────────────────────────────────────────────────────────────
-# SAVE RESULTS
+# SAVE
 # ─────────────────────────────────────────────────────────────────────
 os.makedirs(OUT_DIR, exist_ok=True)
 summary = {
-    "results": [
-        {k: v for k, v in r.items()
-         if k not in ("balance_hist", "profits")}
-        for r in results
-    ],
-    "grade": grade,
-    "score": f"{passed}/{len(checks)}"
+    "results": [{k:v for k,v in r.items()} for r in results],
+    "grade": grade, "score": f"{passed}/{len(checks)}"
 }
 out_json = os.path.join(OUT_DIR, "final_demo_report.json")
 with open(out_json, "w") as f:
@@ -221,7 +254,5 @@ with open(out_json, "w") as f:
 
 print()
 print(f"  Report saved → {out_json}")
-print()
 print("  Next: python visualize/week8_dashboard.py")
 print("=" * 65)
-print()

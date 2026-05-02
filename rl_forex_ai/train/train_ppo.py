@@ -10,7 +10,7 @@ from utils.data_loader import load_forex_data
 from agent.dqn_agent import DQNAgent
 
 # ── CONFIG (ubah WEEK untuk switch) ──────────────────────────────────
-WEEK        = 4        # 2, 3, atau 4
+WEEK        = 3        # 2, 3, atau 4
 EPISODES    = 500
 PRINT_EVERY = 25
 TRAIN_EVERY = 4
@@ -82,3 +82,17 @@ with open(f"{out}/models/trained_agent_week{WEEK}.pkl", "wb") as f:
     pickle.dump({"weights": agent.model.get_weights(), "week": WEEK}, f)
 
 print(f"  Model → models/trained_agent_week{WEEK}.pkl")
+
+# # Step 1: Training Week 3 (+SL/TP/Risk)
+# # Buka train/train_ppo.py → ubah baris: WEEK = 3
+# python train/train_ppo.py
+
+# # Step 2: Training Week 4 (+RSI/MA/S&R) — model terbaik
+# # Buka train/train_ppo.py → ubah baris: WEEK = 4
+# python train/train_ppo.py
+
+# # Step 3: Final demo lengkap (3 week comparison)
+# python test/final_demo.py
+
+# # Step 4: Dashboard
+# python visualize/week8_dashboard.py

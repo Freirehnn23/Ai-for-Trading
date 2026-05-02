@@ -1,0 +1,51 @@
+{
+  "results": [
+    {
+      "label": "Week 2 \u2014 Spread+Commission",
+      "final_balance": 2250.484281267571,
+      "total_return": 1.2504842812675712,
+      "total_trades": 382,
+      "win_rate": 0.5549738219895288,
+      "profit_factor": 1.4852103094966729,
+      "sharpe_ratio": 2.1459536305999998,
+      "max_drawdown": 0.2282487378847803,
+      "calmar_ratio": 5.478603267891076,
+      "hold_pct": 0.0,
+      "buy_pct": 55.111633372502936,
+      "sell_pct": 44.888366627497064,
+      "eval_time_s": 0.03853106498718262
+    },
+    {
+      "label": "Week 3 \u2014 +SL/TP/Risk",
+      "final_balance": 1232.7757464299248,
+      "total_return": 0.23277574642992477,
+      "total_trades": 425,
+      "win_rate": 0.49411764705882355,
+      "profit_factor": 1.3497770787791579,
+      "sharpe_ratio": 1.9021436764827189,
+      "max_drawdown": 0.11439626173855427,
+      "calmar_ratio": 2.0348195202559998,
+      "hold_pct": 0.23501762632197415,
+      "buy_pct": 49.94124559341951,
+      "sell_pct": 49.82373678025852,
+      "eval_time_s": 0.05390214920043945
+    },
+    {
+      "label": "Week 4 \u2014 +RSI/MA/S&R  [FINAL]",
+      "final_balance": 1239.228863739254,
+      "total_return": 0.23922886373925395,
+      "total_trades": 382,
+      "win_rate": 0.5104712041884817,
+      "profit_factor": 1.3440742224243614,
+      "sharpe_ratio": 1.8815943606324426,
+      "max_drawdown": 0.1428530268376895,
+      "calmar_ratio": 1.6746502964271615,
+      "hold_pct": 9.626955475330927,
+      "buy_pct": 46.450060168471715,
+      "sell_pct": 43.922984356197354,
+      "eval_time_s": 0.08745551109313965
+    }
+  ],
+  "grade": "EXCELLENT \ud83c\udfc6",
+  "score": "7/7"
+}

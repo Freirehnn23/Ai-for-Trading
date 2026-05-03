@@ -12,6 +12,10 @@ class WindowedObservationWrapper(gym.ObservationWrapper):
         (window_size, features)
 
     Berguna untuk LSTM, CNN-1D, dan Transformer.
+
+    UPDATE:
+    - Menambahkan get_action_mask() agar env Week5 bisa meneruskan valid-action mask
+      ke PPOSequenceAgent.
     """
 
     def __init__(self, env, window_size=32):
@@ -44,3 +48,14 @@ class WindowedObservationWrapper(gym.ObservationWrapper):
 
     def _get_obs(self):
         return np.array(self.buffer, dtype=np.float32)
+
+    def get_action_mask(self):
+        """
+        Ambil action mask dari base environment jika tersedia.
+
+        Return:
+            np.ndarray[bool] atau None.
+        """
+        if hasattr(self.env, "get_action_mask"):
+            return self.env.get_action_mask()
+        return None

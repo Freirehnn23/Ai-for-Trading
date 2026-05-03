@@ -1,6 +1,10 @@
 """
 PPO Sequence Agent untuk trading time-series.
 
+UPDATE ACTION MASKING:
+- Mendukung action_mask saat training dan evaluation.
+- Berguna untuk Week5 agar agent tidak memilih action invalid.
+
 Mendukung encoder JST:
 - cnn1d
 - lstm
@@ -90,7 +94,6 @@ class AttentionEncoder(nn.Module):
         attn_out, _ = self.attention(x, x, x)
         x = self.norm(x + attn_out)
 
-        # mean pooling across time
         return x.mean(dim=1)
 
 
@@ -138,7 +141,6 @@ class TransformerEncoder(nn.Module):
         x = self.transformer(x)
         x = self.norm(x)
 
-        # ambil token terakhir sebagai representasi state terbaru
         return x[:, -1, :]
 
 
@@ -288,21 +290,72 @@ class PPOSequenceAgent:
             device=self.device,
         )
 
+    def _mask_to_tensor(self, action_mask, batch_size: int | None = None) -> torch.Tensor | None:
+        if action_mask is None:
+            return None
+
+        mask = np.asarray(action_mask, dtype=bool)
+
+        if mask.ndim == 1:
+            mask = mask[None, :]
+
+        mask_t = torch.tensor(mask, dtype=torch.bool, device=self.device)
+
+        if batch_size is not None and mask_t.shape[0] == 1 and batch_size > 1:
+            mask_t = mask_t.expand(batch_size, -1)
+
+        if mask_t.shape[-1] != self.action_dim:
+            raise ValueError(
+                f"action_mask harus punya panjang {self.action_dim}, "
+                f"tetapi dapat {mask_t.shape[-1]}"
+            )
+
+        return mask_t
+
+    @staticmethod
+    def _apply_action_mask(logits: torch.Tensor, action_mask: torch.Tensor | None) -> torch.Tensor:
+        if action_mask is None:
+            return logits
+
+        # Pastikan minimal ada 1 action valid per baris.
+        valid_count = action_mask.sum(dim=-1)
+        if torch.any(valid_count == 0):
+            raise ValueError("action_mask punya baris tanpa action valid")
+
+        return logits.masked_fill(~action_mask, -1e9)
+
     @torch.no_grad()
     def select_action(
         self,
         obs: np.ndarray,
         deterministic: bool = False,
+        action_mask=None,
+        min_confidence: float | None = None,
     ) -> Tuple[int, float, float]:
         self.net.eval()
 
         state_t = self._obs_to_tensor(obs)
         logits, value = self.net(state_t)
 
-        dist = Categorical(logits=logits)
+        mask_t = self._mask_to_tensor(action_mask, batch_size=logits.shape[0])
+        masked_logits = self._apply_action_mask(logits, mask_t)
+
+        dist = Categorical(logits=masked_logits)
 
         if deterministic:
-            action = torch.argmax(logits, dim=-1)
+            action = torch.argmax(masked_logits, dim=-1)
+
+            if min_confidence is not None:
+                probs = torch.softmax(masked_logits, dim=-1)
+                confidence = probs.max(dim=-1).values
+                hold_action = torch.zeros_like(action)
+
+                if mask_t is None or bool(mask_t[0, 0].item()):
+                    action = torch.where(
+                        confidence < float(min_confidence),
+                        hold_action,
+                        action,
+                    )
         else:
             action = dist.sample()
 
@@ -318,9 +371,12 @@ class PPOSequenceAgent:
         self,
         states: torch.Tensor,
         actions: torch.Tensor,
+        action_masks: torch.Tensor | None = None,
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         logits, values = self.net(states)
-        dist = Categorical(logits=logits)
+        masked_logits = self._apply_action_mask(logits, action_masks)
+
+        dist = Categorical(logits=masked_logits)
 
         log_probs = dist.log_prob(actions)
         entropy = dist.entropy()
@@ -396,6 +452,14 @@ class PPOSequenceAgent:
             device=self.device,
         )
 
+        action_masks = None
+        if "action_masks" in rollout and rollout["action_masks"] is not None:
+            action_masks = torch.tensor(
+                np.asarray(rollout["action_masks"], dtype=bool),
+                dtype=torch.bool,
+                device=self.device,
+            )
+
         advantages = (
             advantages - advantages.mean()
         ) / (advantages.std(unbiased=False) + 1e-8)
@@ -425,10 +489,12 @@ class PPOSequenceAgent:
                 mb_old_log_probs = old_log_probs[mb_idx_t]
                 mb_returns = returns[mb_idx_t]
                 mb_advantages = advantages[mb_idx_t]
+                mb_action_masks = action_masks[mb_idx_t] if action_masks is not None else None
 
                 new_log_probs, entropy, values = self.evaluate_actions(
                     mb_states,
                     mb_actions,
+                    action_masks=mb_action_masks,
                 )
 
                 ratio = torch.exp(new_log_probs - mb_old_log_probs)
@@ -483,7 +549,10 @@ class PPOSequenceAgent:
         torch.save(payload, path)
 
     def load(self, path: str, load_optimizer: bool = False) -> None:
-        payload = torch.load(path, map_location=self.device)
+        try:
+            payload = torch.load(path, map_location=self.device, weights_only=False)
+        except TypeError:
+            payload = torch.load(path, map_location=self.device)
 
         self.net.load_state_dict(payload["model_state_dict"])
 
